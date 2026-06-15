@@ -235,3 +235,16 @@ CREATE TABLE IF NOT EXISTS subscriptions (
   FOREIGN KEY (recruiter_id) REFERENCES recruiters(id),
   FOREIGN KEY (plan_id) REFERENCES plans(id)
 );
+
+CREATE TABLE IF NOT EXISTS refresh_tokens (
+  id CHAR(36) PRIMARY KEY,
+  user_id CHAR(36) NOT NULL,
+  token_hash VARCHAR(255) NOT NULL,
+  expires_at DATETIME NOT NULL,
+  revoked_at DATETIME NULL,
+  replaced_by CHAR(36) NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  INDEX idx_refresh_tokens_user (user_id)
+);
