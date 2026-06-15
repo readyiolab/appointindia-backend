@@ -1,0 +1,34 @@
+version: '3.9'
+services:
+  api:
+    build: .
+    container_name: job-portal-api
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    depends_on:
+      - mysql
+      - redis
+    restart: unless-stopped
+
+  mysql:
+    image: mysql:8.0
+    container_name: job-portal-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: job_portal
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  redis:
+    image: redis:7-alpine
+    container_name: job-portal-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+volumes:
+  mysql-data:

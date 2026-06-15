@@ -1,0 +1,520 @@
+openapi: 3.0.3
+info:
+  title: Job Portal Backend API
+  version: 1.0.0
+  description: Production-ready backend skeleton for a scalable job portal
+servers:
+  - url: http://localhost:3000/api/v1
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    ApiResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          nullable: true
+        meta:
+          type: object
+          properties:
+            timestamp:
+              type: string
+              format: date-time
+paths:
+  /auth/register:
+    post:
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+                role:
+                  type: string
+      responses:
+        '201':
+          description: User registered
+        '400':
+          description: Validation error
+  /auth/login:
+    post:
+      summary: Login user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login success
+        '401':
+          description: Invalid credentials
+  /auth/refresh:
+    post:
+      summary: Refresh access token
+      responses:
+        '200':
+          description: Token refreshed
+  /auth/logout:
+    post:
+      summary: Logout current session
+      responses:
+        '200':
+          description: Logged out
+  /users/me:
+    get:
+      summary: Fetch current user profile
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User profile
+    put:
+      summary: Update current user profile
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Profile updated
+  /users/change-password:
+    patch:
+      summary: Change current user password
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [currentPassword, newPassword]
+              properties:
+                currentPassword:
+                  type: string
+                newPassword:
+                  type: string
+      responses:
+        '200':
+          description: Password updated
+  /candidates/me:
+    get:
+      summary: Fetch current candidate profile
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Candidate profile
+    put:
+      summary: Upsert current candidate profile
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Candidate profile saved
+  /companies:
+    post:
+      summary: Create a company
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Company created
+  /companies/{id}:
+    get:
+      summary: Fetch company by id
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Company details
+  /recruiters:
+    post:
+      summary: Create recruiter
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Recruiter created
+  /recruiters/{id}:
+    get:
+      summary: Fetch recruiter by id
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Recruiter details
+  /jobs/search:
+    get:
+      summary: Search jobs
+      parameters:
+        - in: query
+          name: location
+          schema:
+            type: string
+        - in: query
+          name: jobType
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Search results
+  /jobs/{id}:
+    get:
+      summary: Fetch job by id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Job details
+    patch:
+      summary: Update a job
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Job updated
+  /jobs:
+    post:
+      summary: Create a job
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Job created
+  /applications/me:
+    get:
+      summary: Fetch current candidate applications
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Applications fetched
+  /applications:
+    post:
+      summary: Submit an application
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Application submitted
+  /applications/{id}/status:
+    patch:
+      summary: Update application status
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  type: string
+      responses:
+        '200':
+          description: Application status updated
+  /resumes/me:
+    get:
+      summary: Fetch current resumes
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Resumes fetched
+  /resumes:
+    post:
+      summary: Upload resume
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Resume uploaded
+  /resumes/{id}:
+    delete:
+      summary: Delete resume
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Resume deleted
+  /saved-jobs/me:
+    get:
+      summary: Fetch saved jobs
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Saved jobs fetched
+  /saved-jobs:
+    post:
+      summary: Save a job
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Job saved
+  /saved-jobs/{id}:
+    delete:
+      summary: Delete saved job
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Saved job removed
+  /notifications/me:
+    get:
+      summary: Fetch notifications
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Notifications fetched
+  /notifications:
+    post:
+      summary: Create notification
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Notification created
+  /notifications/{id}/read:
+    patch:
+      summary: Mark notification as read
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Notification marked as read
+  /interviews/me:
+    get:
+      summary: Fetch interviews for current candidate
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Interviews fetched
+  /interviews:
+    post:
+      summary: Schedule an interview
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Interview scheduled
+  /interviews/{id}:
+    patch:
+      summary: Update an interview
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Interview updated
+  /analytics/summary:
+    get:
+      summary: Fetch analytics summary
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Analytics summary
+  /admin/users:
+    get:
+      summary: List all users
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Users fetched
+  /admin/users/{id}/status:
+    patch:
+      summary: Update a user status
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  type: string
+      responses:
+        '200':
+          description: User status updated
+  /subscriptions/plans:
+    get:
+      summary: List subscription plans
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Plans fetched
+  /subscriptions:
+    post:
+      summary: Create a subscription
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Subscription created
